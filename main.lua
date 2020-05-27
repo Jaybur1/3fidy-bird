@@ -9,8 +9,17 @@ VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 
 -- Load Images
+
+--handle background
 local background = love.graphics.newImage("assets/background.png")
+local backgroundScroll = 0
+local BACKGROUND_SPEED = 30
+local BACKGROUND_LOOPING_POINT = 413
+--handle ground
 local ground = love.graphics.newImage("assets/ground.png")
+local groundScroll = 0
+local GROUND_SPEED = 60
+
 local pipe = love.graphics.newImage("assets/pipe.png")
 local bird = love.graphics.newImage("assets/bird.png")
 local fiddy = love.graphics.newImage("assets/3fiddy.png")
@@ -47,20 +56,25 @@ function love.keypressed(key)
   end
 end
 
+function love.update(dt)
+  backgroundScroll = (backgroundScroll + BACKGROUND_SPEED * dt) % BACKGROUND_LOOPING_POINT
+
+  groundScroll = (groundScroll + GROUND_SPEED * dt)
+end
+
 function love.draw()
   push:start()
-  love.graphics.draw(background, 0, 0)
+  love.graphics.draw(background, -backgroundScroll, 0)
 
-  love.graphics.draw(ground, 0, VIRTUAL_HEIGHT - 16)
+  love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
 
   displayTitle()
   push:finish()
 end
 
 function displayTitle()
-  love.graphics.setFont(titleFont);
+  love.graphics.setFont(titleFont)
   love.graphics.printf("3-Fiddy bird", 0, 50, VIRTUAL_WIDTH, "center")
-  love.graphics.setFont(smallFont);
+  love.graphics.setFont(smallFont)
   love.graphics.printf("Press ENTER to start", 0, 80, VIRTUAL_WIDTH, "center")
-
 end
