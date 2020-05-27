@@ -3,6 +3,7 @@ push = require "push"
 Class = require "class"
 
 require "Bird"
+require "Pipe"
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -28,7 +29,8 @@ local GROUND_SPEED = 60
 
 function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest")
-
+  math.randomseed(os.time())
+  
   love.window.setTitle("3Fiddy Bird")
 
   smallFont = love.graphics.newFont("assets/font.ttf", 16)
