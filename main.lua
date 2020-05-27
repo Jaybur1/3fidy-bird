@@ -10,7 +10,14 @@ WINDOW_HEIGHT = 720
 
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
+  --init Bird
+local bird = Bird()
+  -- init Pipes
+local pipes = {
 
+}
+
+local timer = 0
 -- Load Images
 
 --handle background
@@ -30,7 +37,7 @@ local GROUND_SPEED = 60
 function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest")
   math.randomseed(os.time())
-  
+
   love.window.setTitle("3Fiddy Bird")
 
   smallFont = love.graphics.newFont("assets/font.ttf", 16)
@@ -50,8 +57,8 @@ function love.load()
   )
 
   love.keyboard.keyPressed = {}
-  --init Bird
-  bird = Bird()
+
+
 end
 
 function love.resize(w, h)
