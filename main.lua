@@ -1,6 +1,8 @@
 push = require "push"
 
-class = require "class"
+Class = require "class"
+
+require "Bird"
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -20,9 +22,9 @@ local ground = love.graphics.newImage("assets/ground.png")
 local groundScroll = 0
 local GROUND_SPEED = 60
 
-local pipe = love.graphics.newImage("assets/pipe.png")
-local bird = love.graphics.newImage("assets/bird.png")
-local fiddy = love.graphics.newImage("assets/3fiddy.png")
+-- local pipe = love.graphics.newImage("assets/pipe.png")
+-- local bird = love.graphics.newImage("assets/bird.png")
+-- local fiddy = love.graphics.newImage("assets/3fiddy.png")
 
 function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest")
@@ -44,6 +46,9 @@ function love.load()
       resizable = true
     }
   )
+
+  --init Bird
+   bird = Bird()
 end
 
 function love.resize(w, h)
@@ -59,7 +64,7 @@ end
 function love.update(dt)
   backgroundScroll = (backgroundScroll + BACKGROUND_SPEED * dt) % BACKGROUND_LOOPING_POINT
 
-  groundScroll = (groundScroll + GROUND_SPEED * dt)
+  groundScroll = (groundScroll + GROUND_SPEED * dt) % VIRTUAL_WIDTH
 end
 
 function love.draw()
@@ -67,7 +72,7 @@ function love.draw()
   love.graphics.draw(background, -backgroundScroll, 0)
 
   love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
-
+  bird:render()
   displayTitle()
   push:finish()
 end
