@@ -10,14 +10,12 @@ WINDOW_HEIGHT = 720
 
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
-  --init Bird
+--init Bird
 local bird = Bird()
-  -- init Pipes
-local pipes = {
+-- init Pipes
+local pipes = {}
 
-}
-
-local timer = 0
+local spawnTimer = 0
 -- Load Images
 
 --handle background
@@ -57,8 +55,6 @@ function love.load()
   )
 
   love.keyboard.keyPressed = {}
-
-
 end
 
 function love.resize(w, h)
@@ -86,7 +82,22 @@ function love.update(dt)
 
   groundScroll = (groundScroll + GROUND_SPEED * dt) % VIRTUAL_WIDTH
 
+  spawnTimer = spawnTimer + dt
+
+  if spawnTimer > 2 then
+    table.insert(pipes, Pipe())
+    spawnTimer = 0
+  end
   bird:update(dt)
+
+  for k, pipe in pairs(pipes) do
+    pipe:update(dt)
+
+    --remove the pipe when it reaches past the edge of the screen
+    if pipe.x < -pipe.width then
+      table.remove( pipes, k)
+    end
+  end
 
   love.keyboard.keyPressed = {}
 end
@@ -94,6 +105,10 @@ end
 function love.draw()
   push:start()
   love.graphics.draw(background, -backgroundScroll, 0)
+  
+  for k,pipe in pairs(pipes) do 
+    pipe:render()
+  end
 
   love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
   bird:render()
