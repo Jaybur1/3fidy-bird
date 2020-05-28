@@ -57,6 +57,19 @@ function love.load()
   mediumFont = love.graphics.newFont("assets.flappy.ttf", 14)
   titleFont = love.graphics.newFont("assets/flappy.ttf", 24)
   hugeFont = love.graphics.newFont("assets/flappy.ttf", 58)
+
+  sounds = {
+    ["jump"] = love.audio.newSource("assets/jump.wav", "static"),
+    ["explosion"] = love.audio.newSource("assets/explosion.wav", "static"),
+    ["hurt"] = love.audio.newSource("assets/hurt.wav", "static"),
+    ["score"] = love.audio.newSource("assets/score.wav", "static"),
+    ["music"] = love.audio.newSource("assets/marios_way.mp3", "static")
+  }
+
+  -- kick off music
+  sounds["music"]:setLooping(true)
+  sounds["music"]:play()
+
   text = "start"
   --screen setup
   push:setupScreen(
@@ -70,6 +83,24 @@ function love.load()
       resizable = true
     }
   )
+
+  -- initialize state machine with all state-returning functions
+  gStateMachine =
+    StateMachine {
+    ["title"] = function()
+      return TitleScreenState()
+    end,
+    ["countdown"] = function()
+      return CountdownState()
+    end,
+    ["play"] = function()
+      return PlayState()
+    end,
+    ["score"] = function()
+      return ScoreState()
+    end
+  }
+  gStateMachine:change("title")
 
   love.keyboard.keyPressed = {}
 end
