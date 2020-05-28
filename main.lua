@@ -4,6 +4,7 @@ Class = require "class"
 
 require "Bird"
 require "Pipe"
+require "PipePair"
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -12,8 +13,8 @@ VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 --init Bird
 local bird = Bird()
--- init Pipes
-local pipes = {}
+-- init Pipes Pairs
+local pipesPairs = {}
 
 local spawnTimer = 0
 -- Load Images
@@ -27,6 +28,11 @@ local BACKGROUND_LOOPING_POINT = 413
 local ground = love.graphics.newImage("assets/ground.png")
 local groundScroll = 0
 local GROUND_SPEED = 60
+
+
+-- initialize our last recorded Y value for a gap placement to base other gaps off of
+local lastY = -PIPE_HEIGHT + math.random(80) + 20
+
 
 -- local pipe = love.graphics.newImage("assets/pipe.png")
 -- local bird = love.graphics.newImage("assets/bird.png")
@@ -85,18 +91,30 @@ function love.update(dt)
   spawnTimer = spawnTimer + dt
 
   if spawnTimer > 2 then
-    table.insert(pipes, Pipe())
-    spawnTimer = 0
+        -- modify the last Y coordinate we placed so pipe gaps aren't too far apart
+        -- no higher than 10 pixels below the top edge of the screen,
+        -- and no lower than a gap length (90 pixels) from the bottom
+        local y = math.max(-PIPE_HEIGHT + 10, 
+            math.min(lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
+        lastY = y
+        
+        table.insert(pipePairs, PipePair(y))
+        spawnTimer = 0
   end
   bird:update(dt)
 
-  for k, pipe in pairs(pipes) do
-    pipe:update(dt)
+  for k, pipes in pairs(pipesPairs) do
+    pipes:update(dt)
 
-    --remove the pipe when it reaches past the edge of the screen
-    if pipe.x < -pipe.width then
-      table.remove( pipes, k)
-    end
+    -- remove any flagged pipes
+    -- we need this second loop, rather than deleting in the previous loop, because
+    -- modifying the table in-place without explicit keys will result in skipping the
+    -- next pipe, since all implicit keys (numerical indices) are automatically shifted
+    -- down after a table removal
+    for k, pair in pairs(pipePairs) do
+      if pair.remove then
+          table.remove(pipePairs, k)
+      end
   end
 
   love.keyboard.keyPressed = {}
@@ -106,8 +124,8 @@ function love.draw()
   push:start()
   love.graphics.draw(background, -backgroundScroll, 0)
   
-  for k,pipe in pairs(pipes) do 
-    pipe:render()
+  for k,pipe in pairs(pipesPairs) do 
+    pipes:render()
   end
 
   love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
