@@ -35,6 +35,7 @@ function Bird:update(dt)
 
   if love.keyboard.wasPressed("space") then
     self.dy = -3.5
+    sounds['jump']:play()
   end
 
   --apply current velocity to current position
