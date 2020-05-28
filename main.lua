@@ -119,6 +119,12 @@ function love.update(dt)
     for k, pipes in pairs(pipePairs) do
       pipes:update(dt)
 
+      for l, pipe in pairs(pipes.pipes) do
+        if bird:collides(pipe) then
+          scrolling = false
+        end
+      end
+
       -- remove any flagged pipes
       -- we need this second loop, rather than deleting in the previous loop, because
       -- modifying the table in-place without explicit keys will result in skipping the
