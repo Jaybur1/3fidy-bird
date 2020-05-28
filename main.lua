@@ -103,6 +103,8 @@ function love.load()
   gStateMachine:change("title")
 
   love.keyboard.keyPressed = {}
+  -- initialize mouse input table
+  love.mouse.buttonsPressed = {}
 end
 
 function love.resize(w, h)
@@ -126,6 +128,25 @@ function love.keypressed(key)
   end
 end
 
+--[[
+    LÖVE2D callback fired each time a mouse button is pressed; gives us the
+    X and Y of the mouse, as well as the button in question.
+]]
+function love.mousepressed(x, y, button)
+  love.mouse.buttonsPressed[button] = true
+end
+
+function love.keyboard.wasPressed(key)
+  return love.keyboard.keysPressed[key]
+end
+
+--[[
+  Equivalent to our keyboard function from before, but for the mouse buttons.
+]]
+function love.mouse.wasPressed(button)
+  return love.mouse.buttonsPressed[button]
+end
+
 function love.keyboard.wasPressed(key)
   if love.keyboard.keyPressed[key] then
     return true
@@ -141,59 +162,20 @@ function love.update(dt)
 
     -- scroll ground by preset speed * dt, looping back to 0 after the screen width passes
     groundScroll = (groundScroll + GROUND_SPEED * dt) % GROUND_LOOPING_POINT
-
-    spawnTimer = spawnTimer + dt
-
-    if spawnTimer > 2.5 then
-      -- modify the last Y coordinate we placed so pipe gaps aren't too far apart
-      -- no higher than 10 pixels below the top edge of the screen,
-      -- and no lower than a gap length (90 pixels) from the bottom
-      local y = math.max(-PIPE_HEIGHT + 10, math.min(lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
-      lastY = y
-
-      table.insert(pipePairs, PipePair(y))
-      spawnTimer = 0
-    end
-    bird:update(dt)
-
-    for k, pipes in pairs(pipePairs) do
-      pipes:update(dt)
-
-      for l, pipe in pairs(pipes.pipes) do
-        if bird:collides(pipe) then
-          scrolling = false
-        end
-      end
-
-      -- remove any flagged pipes
-      -- we need this second loop, rather than deleting in the previous loop, because
-      -- modifying the table in-place without explicit keys will result in skipping the
-      -- next pipe, since all implicit keys (numerical indices) are automatically shifted
-      -- down after a table removal
-      for k, pair in pairs(pipePairs) do
-        if pair.remove then
-          table.remove(pipePairs, k)
-        end
-      end
-    end
   end
 
-  love.keyboard.keyPressed = {}
+  gStateMachine:update(dt)
+
+  love.keyboard.keysPressed = {}
+  love.mouse.buttonsPressed = {}
 end
 
 function love.draw()
   push:start()
   love.graphics.draw(background, -backgroundScroll, 0)
-
-  for k, pipes in pairs(pipePairs) do
-    pipes:render()
-  end
-
+  gStateMachine:render()
   love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
-  bird:render()
-  if not scrolling then
-    displayTitle(text)
-  end
+
   push:finish()
 end
 
