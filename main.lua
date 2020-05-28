@@ -53,9 +53,11 @@ function love.load()
 
   love.window.setTitle("3Fiddy Bird")
 
-  smallFont = love.graphics.newFont("assets/font.ttf", 16)
+  smallFont = love.graphics.newFont("assets/font.ttf", 12)
+  mediumFont = love.graphics.newFont("assets.flappy.ttf", 14)
   titleFont = love.graphics.newFont("assets/flappy.ttf", 24)
-  text = 'start'
+  hugeFont = love.graphics.newFont("assets/flappy.ttf", 58)
+  text = "start"
   --screen setup
   push:setupScreen(
     VIRTUAL_WIDTH,
@@ -85,7 +87,7 @@ function love.keypressed(key)
 
   if key == "enter" or key == "return" then
     if scrolling then
-      text = 'resume'
+      text = "resume"
       scrolling = false
     else
       scrolling = true
